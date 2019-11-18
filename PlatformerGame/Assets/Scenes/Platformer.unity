@@ -782,7 +782,7 @@ GameObject:
   - component: {fileID: 935407210}
   - component: {fileID: 935407209}
   - component: {fileID: 935407208}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1044,7 +1044,7 @@ MonoBehaviour:
   Player: {fileID: 310417470}
   distance: 5
   playerHeight: 2
-  PlayerControlEnabled: 1
+  PlayerControlEnabled: 0
   playerControlTime: 10
   xSensitivity: 0.5
   ySensitivity: 0.25
@@ -1529,6 +1529,31 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951840410859868959, guid: dd09348808789eb45a8ca5e6cae75e75,
+        type: 3}
+      propertyPath: moveSpeed
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951840410859868959, guid: dd09348808789eb45a8ca5e6cae75e75,
+        type: 3}
+      propertyPath: maxSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951840410859868959, guid: dd09348808789eb45a8ca5e6cae75e75,
+        type: 3}
+      propertyPath: moveAcceleration
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951840410859868959, guid: dd09348808789eb45a8ca5e6cae75e75,
+        type: 3}
+      propertyPath: innitialJumpVelocity
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951840410859868959, guid: dd09348808789eb45a8ca5e6cae75e75,
+        type: 3}
+      propertyPath: jumpDeceleration
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dd09348808789eb45a8ca5e6cae75e75, type: 3}

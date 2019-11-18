@@ -11,7 +11,10 @@ public class FistFighterController : MonoBehaviour
     [SerializeField]
     [Tooltip("How fast the player moves")]
     [Range(0, 50)]
-    float moveSpeed = 1.0f;
+    float moveAcceleration = 5.0f;
+    [SerializeField]
+    float maxSpeed = 10.0f;
+    float moveVelocity = 0.0f;
 
     [Header("Animation Stuff")]
     [SerializeField]
@@ -21,6 +24,15 @@ public class FistFighterController : MonoBehaviour
     [SerializeField]
     float idleTime = 1;
     float idleCountdown = 0;
+    
+    [SerializeField]
+    float innitialJumpVelocity = 1.0f;
+    [SerializeField]
+    float jumpDeceleration = 1.0f;
+    float jumpVelocity = 0.0f;
+    bool jumping = false;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,11 +46,34 @@ public class FistFighterController : MonoBehaviour
         if (dir != Vector3.zero)
         {
             transform.rotation = Quaternion.LookRotation(dir);
-            transform.position += transform.forward * moveSpeed * Time.deltaTime;
+            moveVelocity += moveAcceleration * Time.deltaTime;
+            moveVelocity = Mathf.Clamp(moveVelocity, 0, maxSpeed);
+            transform.position += transform.forward * moveVelocity * Time.deltaTime;
             idleCountdown = idleTime;
         }
-        animator.SetFloat("MoveSpeed", (dir * moveSpeed).magnitude);
+        else
+        {
+            moveVelocity = 0;
+        }
+        animator.SetFloat("MoveSpeed", (dir * moveVelocity).magnitude);
 
+
+
+        if (punchAnimationCountdown <= 0 && Input.GetKeyDown(KeyCode.Space))
+            startJump();
+        if(jumping)
+        {
+            transform.position += Vector3.up * jumpVelocity * Time.deltaTime;
+            jumpVelocity -= jumpDeceleration * Time.deltaTime;
+            int layerMask = 1 << LayerMask.NameToLayer("Floor");
+            if(Physics.Raycast(transform.position + Vector3.up, Vector3.down, out RaycastHit hit, 1, layerMask))
+            {
+                transform.position = hit.point;
+                jumpVelocity = 0;
+                jumping = false;
+                animator.SetBool("Jumping", false);
+            }
+        }
 
         if (Input.GetMouseButtonDown(0))
             attack();
@@ -49,6 +84,13 @@ public class FistFighterController : MonoBehaviour
         animator.SetFloat("IdleCountdown", idleCountdown);
         if (idleCountdown > 0)
             idleCountdown -= Time.deltaTime;
+    }
+
+    void startJump()
+    {
+        jumpVelocity = innitialJumpVelocity;
+        jumping = true;
+        animator.SetBool("Jumping", true);
     }
 
     Vector3 getMovedir()

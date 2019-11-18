@@ -61,6 +61,8 @@ public class CollectableScript : MonoBehaviour
             Collected = true;
             blackboard.AddPlayerScore(1, transform.position);
             GetComponent<Collider>().enabled = false;
+            transform.SetParent(other.transform);
+            transform.localPosition = Vector3.zero + Vector3.up;
         }
     }
 }
