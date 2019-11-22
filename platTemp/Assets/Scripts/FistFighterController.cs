@@ -7,6 +7,11 @@ public class FistFighterController : MonoBehaviour
 {
     Animator animator;
 
+    [SerializeField]
+    float height = 2;
+    [SerializeField]
+    float playerRadius = 0.25f;
+
     [Header("Movement")]
     [SerializeField]
     [Tooltip("How fast the player moves")]
@@ -83,6 +88,13 @@ public class FistFighterController : MonoBehaviour
         if (jumping)
             resolveJumping();
 
+        if (!jumping && !checkGrounded())
+        {
+            jumping = true;
+            animator.SetBool("Jumping", true);
+        }
+
+
         if (Input.GetMouseButtonDown(0))
             attack();
 
@@ -106,18 +118,15 @@ public class FistFighterController : MonoBehaviour
         transform.position += Vector3.up * jumpVelocity * Time.deltaTime;
         jumpVelocity -= jumpDeceleration * Time.deltaTime;
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
-        if (Physics.Raycast(transform.position + Vector3.up, Vector3.down, out RaycastHit hit, 2, layerMask))
+        if (checkGrounded(2, out RaycastHit hit))
         {
             if (hit.distance < 1)
             {
                 transform.position = hit.point;
                 jumpVelocity = 0;
                 jumping = false;
-                moveVelocity = 0;
             }
-            //else if (hit.distance < 1.125f)
-            //    landCountdown = landEndLagTime;
-            if (hit.distance < 1.25f && jumpVelocity < 0)
+            if (hit.distance < 1.25f && jumpVelocity <= 0)
                 animator.SetBool("Jumping", false);
         }
     }
@@ -155,7 +164,7 @@ public class FistFighterController : MonoBehaviour
         normal = Vector3.zero;
         Vector3 dir = velocity.normalized;
         Vector3 dirPerp = new Vector3(dir.z, dir.y, -dir.x);
-        Vector3 origin = transform.position + Vector3.up * 1 + dirPerp * 0.25f;
+        Vector3 origin = transform.position + Vector3.up * height + dirPerp * playerRadius + dir * playerRadius;
 
         RaycastHit closest = new RaycastHit();
 
@@ -163,12 +172,17 @@ public class FistFighterController : MonoBehaviour
 
         for (int i = 0; i < 3; i++)
         {
-            if(Physics.Raycast(origin, dir, out RaycastHit hit, velocity.magnitude + 0.25f, layermask))
+            for (int j = 0; j < 3; j++)
             {
-                if (!closest.collider || hit.distance < closest.distance)
-                    closest = hit;
+                Debug.DrawLine(origin, origin + dir * (velocity.magnitude + playerRadius));
+                if (Physics.Raycast(origin, dir, out RaycastHit hit, velocity.magnitude, layermask))
+                {
+                    if (!closest.collider || hit.distance < closest.distance)
+                        closest = hit;
+                }
+                origin += -dirPerp * playerRadius;
             }
-            origin += -dirPerp * 0.25f;
+            origin += dirPerp * playerRadius * 3 - (transform.up * height * 0.5f);
         }
 
         if (closest.collider != null)
@@ -180,5 +194,50 @@ public class FistFighterController : MonoBehaviour
             return false;
     }
 
+    bool checkGrounded()
+    {
+        bool grounded = false;
+        Vector3 origin = transform.position + Vector3.up * height * 0.5f + transform.forward * playerRadius + transform.right * playerRadius;
 
+        int layermask = 1 << LayerMask.NameToLayer("Environment");
+
+        int dirInverted = -1;
+        for(int i = 0; i < 3; i++)
+        {
+            for(int j = 0; j < 3; j++)
+            {
+                if (Physics.Raycast(origin, Vector3.down, height * 0.5f, layermask))
+                    grounded = true;
+                origin += transform.right * playerRadius * dirInverted;
+            }
+            dirInverted *= -1;
+            origin += -transform.forward * playerRadius;
+        }
+
+        return grounded;
+    }
+    bool checkGrounded(float distance, out RaycastHit hit)
+    {
+        Vector3 origin = transform.position + Vector3.up * height * 0.5f + transform.forward * playerRadius + transform.right * playerRadius;
+
+        int layermask = 1 << LayerMask.NameToLayer("Environment");
+
+        int dirInverted = -1;
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                if (Physics.Raycast(origin, Vector3.down, out RaycastHit hitInfo, distance, layermask))
+                {
+                    hit = hitInfo;
+                    return true;
+                }
+                origin += transform.right * playerRadius * dirInverted;
+            }
+            dirInverted *= -1;
+            origin += -transform.forward * playerRadius;
+        }
+        hit = new RaycastHit();
+        return false;
+    }
 }
