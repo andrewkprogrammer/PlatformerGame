@@ -72,10 +72,8 @@ public class FistFighterController : MonoBehaviour
             dir = Vector3.zero;
         }
         Vector3 moveDir = transform.forward;
-        while(checkWall(moveDir * moveVelocity * Time.deltaTime, out Vector3 colNorm))
-        {
-            moveDir += colNorm;
-        }
+        while(moveDir != Vector3.zero && checkWall(moveDir * moveVelocity * Time.deltaTime, out Vector3 colNorm))
+            moveDir = Vector3.ProjectOnPlane(moveDir, colNorm);
         transform.position += moveDir * moveVelocity * Time.deltaTime;
         animator.SetFloat("MoveSpeed", moveVelocity);
 
@@ -118,7 +116,7 @@ public class FistFighterController : MonoBehaviour
         transform.position += Vector3.up * jumpVelocity * Time.deltaTime;
         jumpVelocity -= jumpDeceleration * Time.deltaTime;
         int layerMask = 1 << LayerMask.NameToLayer("Environment");
-        if (checkGrounded(2, out RaycastHit hit))
+        if (checkGrounded(2, out RaycastHit hit) && jumpVelocity <= 0)
         {
             if (hit.distance < 1)
             {
@@ -126,7 +124,7 @@ public class FistFighterController : MonoBehaviour
                 jumpVelocity = 0;
                 jumping = false;
             }
-            if (hit.distance < 1.25f && jumpVelocity <= 0)
+            if (hit.distance < 1.25f)
                 animator.SetBool("Jumping", false);
         }
     }
@@ -164,9 +162,12 @@ public class FistFighterController : MonoBehaviour
         normal = Vector3.zero;
         Vector3 dir = velocity.normalized;
         Vector3 dirPerp = new Vector3(dir.z, dir.y, -dir.x);
-        Vector3 origin = transform.position + Vector3.up * height + dirPerp * playerRadius + dir * playerRadius;
+        Vector3 origin = transform.position + Vector3.up * height * 0.9f + dirPerp * playerRadius - dir * playerRadius;
+        float range = velocity.magnitude + playerRadius * 2;
 
         RaycastHit closest = new RaycastHit();
+
+        bool objectHit = false;
 
         int layermask = 1 << LayerMask.NameToLayer("Environment");
 
@@ -174,20 +175,23 @@ public class FistFighterController : MonoBehaviour
         {
             for (int j = 0; j < 3; j++)
             {
-                Debug.DrawLine(origin, origin + dir * (velocity.magnitude + playerRadius));
-                if (Physics.Raycast(origin, dir, out RaycastHit hit, velocity.magnitude, layermask))
+                Debug.DrawLine(origin, origin + dir * range);
+                if (Physics.Raycast(origin, dir, out RaycastHit hit, range, layermask))
                 {
-                    if (!closest.collider || hit.distance < closest.distance)
+                    if (!objectHit || hit.distance < closest.distance)
                         closest = hit;
+                    objectHit = true;
                 }
                 origin += -dirPerp * playerRadius;
             }
-            origin += dirPerp * playerRadius * 3 - (transform.up * height * 0.5f);
+            origin += dirPerp * playerRadius * 3 - (transform.up * height * 0.45f);
         }
 
-        if (closest.collider != null)
+        if (objectHit)
         {
             normal = closest.normal;
+            normal.y = 0;
+            normal.Normalize();
             return true;
         }
         else

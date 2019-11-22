@@ -173,7 +173,7 @@ GameObject:
   - component: {fileID: 6886313480615168866}
   - component: {fileID: 310417475}
   m_Layer: 0
-  m_Name: FistFighter
+  m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -227,6 +227,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37cbe0258a7b6a4459aead089ede4100, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  height: 2
+  playerRadius: 0.25
   moveAcceleration: 10
   maxSpeed: 10
   moveDeceleration: 30
