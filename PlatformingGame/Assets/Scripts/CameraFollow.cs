@@ -19,14 +19,20 @@ public class CameraFollow : MonoBehaviour
     float playerControlTime = 1;
     float playerControlCountdown = 0;
     [SerializeField]
-    [Range(0, 1)]
-    float xSensitivity = 1;
+    [Range(0, 120)]
+    float xSensitivity = 90;
     [SerializeField]
-    [Range(0, 1)]
-    float ySensitivity = 1;
+    [Range(0, 120)]
+    float ySensitivity = 90;
 
-    Vector3 cursorLastPos = Vector3.zero;
-
+    [Tooltip("How high the camera can go, 1 being directly above the player, -1 being beneath")]
+    [SerializeField]
+    [Range(-1, 1)]
+    float cameraMaxHeight = 0.5f;
+    [Tooltip("How high the camera can go, 1 being directly above the player, -1 being beneath")]
+    [SerializeField]
+    [Range(-1, 1)]
+    float cameraMinHeight = -0.1f;
 
 
     Vector3 playerForward { get { return -Player.transform.forward; } }
@@ -35,40 +41,67 @@ public class CameraFollow : MonoBehaviour
 
     Vector3 lookAtPos { get { return Player.transform.position + (Player.transform.up * playerHeight); } }
 
+    bool cursorInWindow { get {
+            return Input.mousePosition.x < Screen.width && Input.mousePosition.x > 0
+            && Input.mousePosition.y < Screen.height && Input.mousePosition.y > 0;
+        } }
+
     // Start is called before the first frame update
     void Start()
     {
-        cursorLastPos = Input.mousePosition;
         transform.position = targetPos;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     // Update is called once per frame
     void Update()
     {
+        // if the player has controlled the camera recently, the script will wait a bit before reverting to automatic movement
         if (playerControlCountdown <= 0)
         {
             transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime);
         }
+        else
+            playerControlCountdown -= Time.deltaTime;
 
-        if (PlayerControlEnabled && Input.mousePosition != cursorLastPos)
+        Vector3 mouseDelta = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0);
+        if (PlayerControlEnabled && mouseDelta.magnitude > 0)
         {
-            Vector3 mouseMovement = Input.mousePosition - cursorLastPos;
+            Debug.Log(mouseDelta.magnitude);
+            // This function will need to check how far the camera movement will go in case it goes outside of the intended bounds.
+            // I.E. If camera will go past bounds, decrease mouseDelta so that it only go up to the bounds instead of past them.
+
+            // Checks if camera is already too high or too low
             float dot = Vector3.Dot(Vector3.down, transform.forward);
-            if ((mouseMovement.y < 0 && dot > 0.5f) || (mouseMovement.y > 0 && dot < -0.0f))
-                mouseMovement.y = 0;
+            if ((mouseDelta.y < 0 && dot > cameraMaxHeight) || (mouseDelta.y > 0 && dot < cameraMinHeight))
+                mouseDelta.y = 0;
+            //
 
-            transform.RotateAround(lookAtPos, Vector3.up, mouseMovement.x * xSensitivity);
-            transform.RotateAround(lookAtPos, -transform.right, mouseMovement.y * ySensitivity);
-
+            // Rotate the camera around the player based on the mouse movement
+            transform.RotateAround(lookAtPos, Vector3.up, mouseDelta.x * xSensitivity);
+            transform.RotateAround(lookAtPos, -transform.right, mouseDelta.y * ySensitivity);
+            //
+            
             playerControlCountdown = playerControlTime;
         }
         transform.LookAt(lookAtPos);
         transform.position = lookAtPos - transform.forward * distance;
 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            PlayerControlEnabled = false;
+        }
+        if (Input.GetMouseButtonDown(0) && Cursor.lockState == CursorLockMode.None && cursorInWindow)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            PlayerControlEnabled = true;
+        }
 
-        if (playerControlCountdown > 0)
-            playerControlCountdown -= Time.deltaTime;
-        cursorLastPos = Input.mousePosition;
-        
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
+    
 }

@@ -55,6 +55,8 @@ public class FistFighterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+
         Vector3 dir = getMovedir();
         if (dir != Vector3.zero && landCountdown <= 0)
         {
