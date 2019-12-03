@@ -22,6 +22,10 @@ public class Blackboard : MonoBehaviour
     int playerScore;
     Vector2 scoreSpritePos;
 
+    [SerializeField]    GameObject PauseMenu;
+
+    bool isPaused = false;
+    public bool IsPaused { get { return isPaused; } }
 
     private void Reset()
     {
@@ -39,6 +43,42 @@ public class Blackboard : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void togglePause()
+    {
+        isPaused = !isPaused;
+        PauseMenu.SetActive(isPaused);
+
+        if (isPaused)
+        {
+            Time.timeScale = 0;
+            Cursor.lockState = CursorLockMode.Confined;
+        }
+        else
+        {
+            Time.timeScale = 1;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        Cursor.visible = isPaused;
+    }
+
+    public void setPause(bool setting)
+    {
+        isPaused = setting;
+        PauseMenu.SetActive(isPaused);
+
+        if (isPaused)
+        {
+            Time.timeScale = 0;
+            Cursor.lockState = CursorLockMode.Confined;
+        }
+        else
+        {
+            Time.timeScale = 1;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        Cursor.visible = isPaused;
     }
 
     public void AddPlayerScore(int amount, Vector3 collectablePos)

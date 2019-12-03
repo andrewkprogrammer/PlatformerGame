@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
-public class FistFighterController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
+    [SerializeField] Blackboard blackboard;
+
     Animator animator;
 
     [SerializeField]
@@ -49,14 +51,21 @@ public class FistFighterController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (!blackboard)
+            blackboard = GameObject.Find("GameManager").GetComponent<Blackboard>();
         animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            blackboard.togglePause();
+        }
+        if(blackboard.IsPaused)
+            return;
         
-
         Vector3 dir = getMovedir();
         if (dir != Vector3.zero && landCountdown <= 0)
         {
@@ -95,7 +104,7 @@ public class FistFighterController : MonoBehaviour
         }
 
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !jumping)
             attack();
 
         if (punchAnimationCountdown > 0)

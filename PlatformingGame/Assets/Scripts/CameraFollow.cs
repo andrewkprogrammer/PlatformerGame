@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
+    [SerializeField] Blackboard blackboard;
     [SerializeField]
     GameObject Player;
 
@@ -52,11 +53,16 @@ public class CameraFollow : MonoBehaviour
         transform.position = targetPos;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        if (!blackboard)
+            blackboard = GameObject.Find("GameManager").GetComponent<Blackboard>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (blackboard.IsPaused)
+            return;
+
         // if the player has controlled the camera recently, the script will wait a bit before reverting to automatic movement
         if (playerControlCountdown <= 0)
         {
@@ -87,19 +93,6 @@ public class CameraFollow : MonoBehaviour
         }
         transform.LookAt(lookAtPos);
         transform.position = lookAtPos - transform.forward * distance;
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-            PlayerControlEnabled = false;
-        }
-        if (Input.GetMouseButtonDown(0) && Cursor.lockState == CursorLockMode.None && cursorInWindow)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            PlayerControlEnabled = true;
-        }
 
         GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
