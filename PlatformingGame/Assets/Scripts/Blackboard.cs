@@ -24,13 +24,16 @@ public class Blackboard : MonoBehaviour
 
     [SerializeField]    GameObject PauseMenu;
 
+    public float XSensitivity { get { return Camera.main.GetComponent<CameraFollow>().xSensitivity; } }
+    public float YSensitivity { get { return Camera.main.GetComponent<CameraFollow>().ySensitivity; } }
+
     bool isPaused = false;
     public bool IsPaused { get { return isPaused; } }
 
     private void Reset()
     {
+        gameObject.name = "GameManager";
         scoreSpritePos = scoreSprite.transform.position;
-        name = "GameManager";
     }
 
     // Start is called before the first frame update
@@ -88,5 +91,15 @@ public class Blackboard : MonoBehaviour
         GameObject temp = Instantiate(CollectedCollectablePrefab, playerUI.transform);
         temp.transform.position = Camera.main.WorldToScreenPoint(collectablePos);
         temp.GetComponent<CollectedUIElement>().targetPos = scoreSprite.transform.position;
+    }
+
+    public void setMouseCamSensX(float value)
+    {
+        Camera.main.GetComponent<CameraFollow>().setSensX(value);
+    }
+
+    public void setMouseCamSensY(float value)
+    {
+        Camera.main.GetComponent<CameraFollow>().setSensY(value);
     }
 }

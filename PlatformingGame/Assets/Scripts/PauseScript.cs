@@ -14,12 +14,6 @@ public class PauseScript : MonoBehaviour
             blackboard = GameObject.Find("GameManager").GetComponent<Blackboard>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void Continue()
     {
         blackboard.setPause(false);
@@ -28,6 +22,8 @@ public class PauseScript : MonoBehaviour
     public void LoadSettings()
     {
         Settings.SetActive(true);
+        GetComponent<CanvasGroup>().interactable = false;
+        Settings.GetComponent<CanvasGroup>().interactable = true;
         gameObject.SetActive(false);
     }
 

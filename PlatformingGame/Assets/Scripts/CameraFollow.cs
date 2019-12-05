@@ -21,10 +21,10 @@ public class CameraFollow : MonoBehaviour
     float playerControlCountdown = 0;
     [SerializeField]
     [Range(0, 120)]
-    float xSensitivity = 90;
+    public float xSensitivity = 90;
     [SerializeField]
     [Range(0, 120)]
-    float ySensitivity = 90;
+    public float ySensitivity = 90;
 
     [Tooltip("How high the camera can go, 1 being directly above the player, -1 being beneath")]
     [SerializeField]
@@ -74,7 +74,6 @@ public class CameraFollow : MonoBehaviour
         Vector3 mouseDelta = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0);
         if (PlayerControlEnabled && mouseDelta.magnitude > 0)
         {
-            Debug.Log(mouseDelta.magnitude);
             // This function will need to check how far the camera movement will go in case it goes outside of the intended bounds.
             // I.E. If camera will go past bounds, decrease mouseDelta so that it only go up to the bounds instead of past them.
 
@@ -96,5 +95,14 @@ public class CameraFollow : MonoBehaviour
 
         GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
-    
+
+    public void setSensX(float value)
+    {
+        xSensitivity = value;
+    }
+
+    public void setSensY(float value)
+    {
+        ySensitivity = value;
+    }
 }
