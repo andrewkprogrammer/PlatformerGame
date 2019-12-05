@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PauseScript : MonoBehaviour
 {
@@ -17,6 +18,12 @@ public class PauseScript : MonoBehaviour
     public void Continue()
     {
         blackboard.setPause(false);
+    }
+
+    public void ResetScene()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void LoadSettings()

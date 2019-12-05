@@ -189,7 +189,7 @@ public class PlayerController : MonoBehaviour
                     transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
                 }
             }
-            origin += 
+            origin += perp * iterateDir;
             iterateDir *= -2;
         }
     }
