@@ -83,8 +83,13 @@ public class PlayerController : MonoBehaviour
             dir = Vector3.zero;
         }
         Vector3 moveDir = transform.forward;
-        while(moveDir != Vector3.zero && checkWall(moveDir * moveVelocity * Time.deltaTime, out Vector3 colNorm))
-            moveDir = Vector3.ProjectOnPlane(moveDir, colNorm);
+        if (moveDir != Vector3.zero)
+        {
+            if(!jumping)
+                checkStep(moveDir * moveVelocity * Time.deltaTime);
+            while (checkWall(moveDir * moveVelocity * Time.deltaTime, out Vector3 colNorm))
+                moveDir = Vector3.ProjectOnPlane(moveDir, colNorm);
+        }
         transform.position += moveDir * moveVelocity * Time.deltaTime;
         animator.SetFloat("MoveSpeed", moveVelocity);
 
@@ -168,12 +173,33 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void checkStep(Vector3 velocity)
+    {
+        Vector3 origin = transform.position + (transform.up * height) + velocity + transform.forward * playerRadius;
+        Vector3 perp = new Vector3(-velocity.z, 0, velocity.x);
+        int layermask = 1 << LayerMask.NameToLayer("Environment");
+        int iterateDir = 1;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, height * 2, layermask))
+            {
+                if (hit.distance < height * 1.1f && hit.distance >= height * 0.75f)
+                {
+                    transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);
+                }
+            }
+            origin += 
+            iterateDir *= -2;
+        }
+    }
+
     bool checkWall(Vector3 velocity, out Vector3 normal)
     {
         normal = Vector3.zero;
         Vector3 dir = velocity.normalized;
         Vector3 dirPerp = new Vector3(dir.z, dir.y, -dir.x);
-        Vector3 origin = transform.position + Vector3.up * height * 0.9f + dirPerp * playerRadius - dir * playerRadius;
+        Vector3 origin = transform.position + Vector3.up * height /** 0.9f*/ + dirPerp * playerRadius - dir * playerRadius;
         float range = velocity.magnitude + playerRadius * 2;
 
         RaycastHit closest = new RaycastHit();
