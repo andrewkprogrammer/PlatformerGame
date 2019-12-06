@@ -29,8 +29,6 @@ public class PauseScript : MonoBehaviour
     public void LoadSettings()
     {
         Settings.SetActive(true);
-        GetComponent<CanvasGroup>().interactable = false;
-        Settings.GetComponent<CanvasGroup>().interactable = true;
         gameObject.SetActive(false);
     }
 

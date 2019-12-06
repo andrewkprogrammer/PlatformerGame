@@ -34,6 +34,16 @@ public class SettingsScript : MonoBehaviour
         instantiateSensitivitySettings();
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            gameObject.SetActive(false);
+        }
+    }
+
     /// <summary>
     /// Makes sure the settings menu has updated info of the current screen settings.
     /// </summary>
@@ -78,8 +88,6 @@ public class SettingsScript : MonoBehaviour
     public void returnPrevMenu()
     {
         prevMenu.SetActive(true);
-        prevMenu.GetComponent<CanvasGroup>().interactable = true;
-        GetComponent<CanvasGroup>().interactable = false;
         gameObject.SetActive(false);
     }
     
