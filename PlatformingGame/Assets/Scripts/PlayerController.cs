@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] Blackboard blackboard;
+    [SerializeField] Collider fistCollider;
 
     Animator animator;
 
@@ -114,6 +115,8 @@ public class PlayerController : MonoBehaviour
 
         if (punchAnimationCountdown > 0)
             punchAnimationCountdown -= Time.deltaTime;
+        else
+            fistCollider.enabled = false;
 
         animator.SetFloat("IdleCountdown", idleCountdown);
         if (idleCountdown > 0 && moveVelocity <= 0)
@@ -168,6 +171,7 @@ public class PlayerController : MonoBehaviour
         if (punchAnimationCountdown <= 0)
         {
             animator.SetTrigger("Punch");
+            fistCollider.enabled = true;
             punchAnimationCountdown = punchAnimationTime;
             idleCountdown = idleTime;
         }

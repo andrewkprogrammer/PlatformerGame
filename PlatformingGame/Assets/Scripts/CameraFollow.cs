@@ -92,8 +92,15 @@ public class CameraFollow : MonoBehaviour
         }
         transform.LookAt(lookAtPos);
         transform.position = lookAtPos - transform.forward * distance;
+        
 
-        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        Vector3 dirfromplayer = (transform.position  - lookAtPos).normalized;
+        if(Physics.Raycast(lookAtPos, dirfromplayer, out RaycastHit hit, distance, 1 << LayerMask.NameToLayer("Environment")))
+        {
+            Debug.DrawLine(lookAtPos, hit.point, Color.white, 5);
+            
+            transform.position = hit.point;
+        }
     }
 
     public void setSensX(float value)
